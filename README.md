@@ -1,3 +1,4 @@
+[See this text in English](https://github.com/FullyRealist/SecureVideoAppECDH/blob/main/README_en.md)
 # SecureVideoAppECDH
 ## SecureStream: Hybrid Video Encryption System (Система гібридного шифрування відео)
 
