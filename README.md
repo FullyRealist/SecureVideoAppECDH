@@ -54,7 +54,7 @@
 
 1.  **Клонуйте репозиторій**:
     ```bash
-    git clone [https://github.com/FullyRealist/SecureVideoAppECDH.git](https://github.com/FullyRealist/SecureVideoAppECDH.git)
+    git clone https://github.com/FullyRealist/SecureVideoAppECDH.git
     ```
 2.  **Відкрийте проєкт**:
     Запустіть файл рішення `.sln` у Visual Studio 2022.
