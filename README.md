@@ -54,7 +54,7 @@ Each encrypted file has a header for autonomous decryption by the recipient:
 
 1.  **Clone the repository**:
     ```bash
-    git clone [https://github.com/FullyRealist/SecureVideoAppECDH.git](https://github.com/FullyRealist/SecureVideoAppECDH.git)
+    git clone https://github.com/FullyRealist/SecureVideoAppECDH.git
     ```
 2.  **Open the project**:
     Launch the `.sln` solution file in Visual Studio 2022.
