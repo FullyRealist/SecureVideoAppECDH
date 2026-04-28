@@ -144,9 +144,28 @@ namespace SecureVideoApp
             {
                 // 1. Парсинг заголовка
                 int pubKeyLen = br.ReadInt32();
+                if (pubKeyLen != KeySize)
+                {
+                    throw new CryptographicException($"Некоректний заголовок: довжина публічного ключа {pubKeyLen} байт, очікується {KeySize}.");
+                }
+
                 byte[] senderEphemeralPublicBytes = br.ReadBytes(pubKeyLen);
+                if (senderEphemeralPublicBytes.Length != KeySize)
+                {
+                    throw new CryptographicException("Некоректний заголовок: не вдалося прочитати ефемерний публічний ключ повністю.");
+                }
+
                 byte[] nonce = br.ReadBytes(StreamNonceSize);
+                if (nonce.Length != StreamNonceSize)
+                {
+                    throw new CryptographicException("Некоректний заголовок: не вдалося прочитати nonce повністю.");
+                }
+
                 byte[] payload = br.ReadBytes((int)(fs.Length - fs.Position));
+                if (payload.Length < MacTagSize)
+                {
+                    throw new CryptographicException("Некоректний контейнер: payload занадто малий (немає AEAD-тегу).");
+                }
 
                 // 2. Відновлення ключів
                 var receiverPrivateKey = new X25519PrivateKeyParameters(receiverPrivateKeyBytes, 0);
