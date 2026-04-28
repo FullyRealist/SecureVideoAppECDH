@@ -5,9 +5,9 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using System;
 using System.Drawing;
-using System.Drawing.Imaging; // Для роботи з bitmap (шум)
+        private string? selectedFilePath;
 using System.IO;
-using System.Runtime.InteropServices; // Для Marshal.Copy
+using System.Runtime.InteropServices; // Г„Г«Гї Marshal.Copy
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,33 +16,33 @@ namespace SecureVideoApp
     public partial class MainForm : Form
     {
 
-        // == Дані програми ==
+        // == Г„Г Г­Ві ГЇГ°Г®ГЈГ°Г Г¬ГЁ ==
         private string selectedFilePath;
-        private const string KeysFile = "ECDH.key"; // Файл для зберігання ключів
+        private const string KeysFile = "ECDH.key"; // Г”Г Г©Г« Г¤Г«Гї Г§ГЎГҐГ°ВіГЈГ Г­Г­Гї ГЄГ«ГѕГ·ВіГў
 
-        // Ключі поточного користувача (X25519)
+        // ГЉГ«ГѕГ·Ві ГЇГ®ГІГ®Г·Г­Г®ГЈГ® ГЄГ®Г°ГЁГ±ГІГіГўГ Г·Г  (X25519)
         private byte[] myPrivateKey;
         private byte[] myPublicKey;
 
-        // Екземпляр нашого крипто-рушія
+        // Г…ГЄГ§ГҐГ¬ГЇГ«ГїГ° Г­Г ГёГ®ГЈГ® ГЄГ°ГЁГЇГІГ®-Г°ГіГёВіГї
         private HybridVideoEncryptor encryptor = new HybridVideoEncryptor();
 
         public MainForm()
         {
-            // Ініціалізація компонентів дизайнера (WMP створюється тут)
+            // ВІГ­ВіГ¶ВіГ Г«ВіГ§Г Г¶ВіГї ГЄГ®Г¬ГЇГ®Г­ГҐГ­ГІВіГў Г¤ГЁГ§Г Г©Г­ГҐГ°Г  (WMP Г±ГІГўГ®Г°ГѕВєГІГјГ±Гї ГІГіГІ)
             InitializeComponent();
 
-            // Завантаження або генерація ключів
+            // Г‡Г ГўГ Г­ГІГ Г¦ГҐГ­Г­Гї Г ГЎГ® ГЈГҐГ­ГҐГ°Г Г¶ВіГї ГЄГ«ГѕГ·ВіГў
             InitializeKeys();
 
-            // Попереднє налаштування плеєра
+            // ГЏГ®ГЇГҐГ°ГҐГ¤Г­Вє Г­Г Г«Г ГёГІГіГўГ Г­Г­Гї ГЇГ«ГҐВєГ°Г 
             try
             {
-                axWindowsMediaPlayer1.uiMode = "none"; // Прибираємо кнопки плеєра
+                axWindowsMediaPlayer1.uiMode = "none"; // ГЏГ°ГЁГЎГЁГ°Г ВєГ¬Г® ГЄГ­Г®ГЇГЄГЁ ГЇГ«ГҐВєГ°Г 
                 axWindowsMediaPlayer1.settings.autoStart = false;
-                axWindowsMediaPlayer1.settings.volume = 0; // Щоб не заважало під час тестів
+                axWindowsMediaPlayer1.settings.volume = 0; // Г™Г®ГЎ Г­ГҐ Г§Г ГўГ Г¦Г Г«Г® ГЇВіГ¤ Г·Г Г± ГІГҐГ±ГІВіГў
             }
-            catch { /* Ігноруємо, якщо плеєр ще не завантажився */ }
+            catch { /* ВІГЈГ­Г®Г°ГіВєГ¬Г®, ГїГЄГ№Г® ГЇГ«ГҐВєГ° Г№ГҐ Г­ГҐ Г§Г ГўГ Г­ГІГ Г¦ГЁГўГ±Гї */ }
         }
 
         private void CreateWindowsMediaPlayerControl()
@@ -56,7 +56,7 @@ namespace SecureVideoApp
             ((System.ComponentModel.ISupportInitialize)axWindowsMediaPlayer1).EndInit();
         }
 
-        // == Логіка роботи з ключами ECDH ==
+        // == Г‹Г®ГЈВіГЄГ  Г°Г®ГЎГ®ГІГЁ Г§ ГЄГ«ГѕГ·Г Г¬ГЁ ECDH ==
         private void InitializeKeys()
         {
             if (File.Exists(KeysFile))
@@ -66,12 +66,12 @@ namespace SecureVideoApp
                     string[] lines = File.ReadAllLines(KeysFile);
                     myPublicKey = Convert.FromBase64String(lines[0]);
                     myPrivateKey = Convert.FromBase64String(lines[1]);
-                    Log("[INFO] Пара ключів X25519 була успішно завантажена з диску");
+                    Log("[INFO] ГЏГ Г°Г  ГЄГ«ГѕГ·ВіГў X25519 ГЎГіГ«Г  ГіГ±ГЇВіГёГ­Г® Г§Г ГўГ Г­ГІГ Г¦ГҐГ­Г  Г§ Г¤ГЁГ±ГЄГі");
                 }
                 catch
                 {
-                    Log("[WARN] Файл ключів було пошкоджено!");
-                    Log("[INFO] Виконується генерація нової пари ключів...");
+                    Log("[WARN] Г”Г Г©Г« ГЄГ«ГѕГ·ВіГў ГЎГіГ«Г® ГЇГ®ГёГЄГ®Г¤Г¦ГҐГ­Г®!");
+                    Log("[INFO] Г‚ГЁГЄГ®Г­ГіВєГІГјГ±Гї ГЈГҐГ­ГҐГ°Г Г¶ВіГї Г­Г®ГўГ®Вї ГЇГ Г°ГЁ ГЄГ«ГѕГ·ВіГў...");
                     GenerateAndSaveKeys();
                 }
             }
@@ -97,20 +97,18 @@ namespace SecureVideoApp
                 Convert.ToBase64String(myPublicKey),
                 Convert.ToBase64String(myPrivateKey)
             });
-            Log("[READY] Нова пара ключів (X25519) була успішно згенерована");
+                    bool isEncrypted = selectedFilePath.EndsWith(".enc", StringComparison.OrdinalIgnoreCase);
         }
 
-        // == Обробники подій ==
-
-        private void BtnSelectFile_Click(object sender, EventArgs e)
+            string outputFile = Path.ChangeExtension(selectedFilePath, null) + "_restored.mp4";
         {
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
-                ofd.Filter = "Медіа файли|*.mp3;*.mp4;*.avi;*.mkv;*.wmv|Зашифровані медіа|*.enc|Усі файли|*.*";
+                ofd.Filter = "ГЊГҐГ¤ВіГ  ГґГ Г©Г«ГЁ|*.mp3;*.mp4;*.avi;*.mkv;*.wmv|Г‡Г ГёГЁГґГ°Г®ГўГ Г­Ві Г¬ГҐГ¤ВіГ |*.enc|Г“Г±Ві ГґГ Г©Г«ГЁ|*.*";
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     selectedFilePath = ofd.FileName;
-                    Log($"Обрано файл: {Path.GetFileName(selectedFilePath)}");
+                    Log($"ГЋГЎГ°Г Г­Г® ГґГ Г©Г«: {Path.GetFileName(selectedFilePath)}");
 
                     bool isEncrypted = selectedFilePath.EndsWith(".enc");
                     btnEncrypt.Enabled = !isEncrypted;
@@ -118,15 +116,15 @@ namespace SecureVideoApp
 
                     if (!isEncrypted)
                     {
-                        // Завантажуємо прев'ю відео
+                        // Г‡Г ГўГ Г­ГІГ Г¦ГіВєГ¬Г® ГЇГ°ГҐГў'Гѕ ГўВіГ¤ГҐГ®
                         axWindowsMediaPlayer1.URL = selectedFilePath;
-                        axWindowsMediaPlayer1.Ctlcontrols.pause(); // Тільки перший кадр
+                        axWindowsMediaPlayer1.Ctlcontrols.pause(); // Г’ВіГ«ГјГЄГЁ ГЇГҐГ°ГёГЁГ© ГЄГ Г¤Г°
                     }
                     else
                     {
                         axWindowsMediaPlayer1.Ctlcontrols.stop();
                         axWindowsMediaPlayer1.URL = "";
-                        pbNoise.Image = null; // Очищаємо шум
+                        pbNoise.Image = null; // ГЋГ·ГЁГ№Г ВєГ¬Г® ГёГіГ¬
                     }
                 }
             }
@@ -139,23 +137,23 @@ namespace SecureVideoApp
             string outputFile = selectedFilePath + ".enc";
             var reporter = GetProgressReporter();
 
-            Log("[INFO] Почато процесс шифрування");
+            Log("[INFO] ГЏГ®Г·Г ГІГ® ГЇГ°Г®Г¶ГҐГ±Г± ГёГЁГґГ°ГіГўГ Г­Г­Гї");
 
-            // Запускаємо відео, щоб показати "ЩО" ми шифруємо
+            // Г‡Г ГЇГіГ±ГЄГ ВєГ¬Г® ГўВіГ¤ГҐГ®, Г№Г®ГЎ ГЇГ®ГЄГ Г§Г ГІГЁ "Г™ГЋ" Г¬ГЁ ГёГЁГґГ°ГіВєГ¬Г®
             axWindowsMediaPlayer1.Ctlcontrols.play();
 
             await RunCryptoTask(() => encryptor.EncryptVideo(
                 selectedFilePath,
                 outputFile,
-                myPublicKey, // У реальній схемі тут був би Public Key отримувача
+                myPublicKey, // Г“ Г°ГҐГ Г«ГјГ­ВіГ© Г±ГµГҐГ¬Ві ГІГіГІ ГЎГіГў ГЎГЁ Public Key Г®ГІГ°ГЁГ¬ГіГўГ Г·Г 
                 reporter,
-                // Callback для візуалізації (викликається з глибин шифратора)
+                // Callback Г¤Г«Гї ГўВіГ§ГіГ Г«ВіГ§Г Г¶ВіВї (ГўГЁГЄГ«ГЁГЄГ ВєГІГјГ±Гї Г§ ГЈГ«ГЁГЎГЁГ­ ГёГЁГґГ°Г ГІГ®Г°Г )
                 (chunk) => UpdateNoiseVisualization(chunk)
             ));
 
-            Log("[INFO] Процес шифрування завершено");
+            Log("[INFO] ГЏГ°Г®Г¶ГҐГ± ГёГЁГґГ°ГіГўГ Г­Г­Гї Г§Г ГўГҐГ°ГёГҐГ­Г®");
             axWindowsMediaPlayer1.Ctlcontrols.pause();
-            Log("Відтворення було призупинено");
+            Log("Г‚ВіГ¤ГІГўГ®Г°ГҐГ­Г­Гї ГЎГіГ«Г® ГЇГ°ГЁГ§ГіГЇГЁГ­ГҐГ­Г®");
         }
 
         private async void BtnDecrypt_Click(object sender, EventArgs e)
@@ -163,13 +161,13 @@ namespace SecureVideoApp
             if (string.IsNullOrEmpty(selectedFilePath)) return;
 
             string outputFile = selectedFilePath.Replace(".enc", "_restored.mp4");
-            // Захист від перезапису, якщо імена збігаються
+            // Г‡Г ГµГЁГ±ГІ ГўВіГ¤ ГЇГҐГ°ГҐГ§Г ГЇГЁГ±Гі, ГїГЄГ№Г® ВіГ¬ГҐГ­Г  Г§ГЎВіГЈГ ГѕГІГјГ±Гї
             if (outputFile == selectedFilePath) outputFile += ".restored.mp4";
 
             var reporter = GetProgressReporter();
 
-            Log("[INFO] Почато процесс розшифрування");
-            // pbNoise.Image = null; // Очищаємо екран шуму
+            Log("[INFO] ГЏГ®Г·Г ГІГ® ГЇГ°Г®Г¶ГҐГ±Г± Г°Г®Г§ГёГЁГґГ°ГіГўГ Г­Г­Гї");
+            // pbNoise.Image = null; // ГЋГ·ГЁГ№Г ВєГ¬Г® ГҐГЄГ°Г Г­ ГёГіГ¬Гі
 
             await RunCryptoTask(() => encryptor.DecryptVideo(
                 selectedFilePath,
@@ -180,33 +178,33 @@ namespace SecureVideoApp
 
             if (File.Exists(outputFile))
             {
-                Log("[INFO] Завантаження та відтворення розшифрованого відео");
+                Log("[INFO] Г‡Г ГўГ Г­ГІГ Г¦ГҐГ­Г­Гї ГІГ  ГўВіГ¤ГІГўГ®Г°ГҐГ­Г­Гї Г°Г®Г§ГёГЁГґГ°Г®ГўГ Г­Г®ГЈГ® ГўВіГ¤ГҐГ®");
                 axWindowsMediaPlayer1.URL = outputFile;
                 axWindowsMediaPlayer1.Ctlcontrols.play();
-                Log("[DONE] Операцію успішно завершено!");
+                Log("[DONE] ГЋГЇГҐГ°Г Г¶ВіГѕ ГіГ±ГЇВіГёГ­Г® Г§Г ГўГҐГ°ГёГҐГ­Г®!");
             }
         }
 
-        // == Допоміжні методи ==
+        // == Г„Г®ГЇГ®Г¬ВіГ¦Г­Ві Г¬ГҐГІГ®Г¤ГЁ ==
 
-        // Метод відмальовування шуму (Ентропії)
+        // ГЊГҐГІГ®Г¤ ГўВіГ¤Г¬Г Г«ГјГ®ГўГіГўГ Г­Г­Гї ГёГіГ¬Гі (Г…Г­ГІГ°Г®ГЇВіВї)
         private void UpdateNoiseVisualization(byte[] data)
         {
-            // Для візуалізації достатньо невеликої роздільної здатності, наприклад 320x240
-            // Формат 24bpp (3 байти на піксель)
+            // Г„Г«Гї ГўВіГ§ГіГ Г«ВіГ§Г Г¶ВіВї Г¤Г®Г±ГІГ ГІГ­ГјГ® Г­ГҐГўГҐГ«ГЁГЄГ®Вї Г°Г®Г§Г¤ВіГ«ГјГ­Г®Вї Г§Г¤Г ГІГ­Г®Г±ГІВі, Г­Г ГЇГ°ГЁГЄГ«Г Г¤ 320x240
+            // Г”Г®Г°Г¬Г ГІ 24bpp (3 ГЎГ Г©ГІГЁ Г­Г  ГЇВіГЄГ±ГҐГ«Гј)
             int width = 320;
             int height = 240;
 
-            // Якщо даних замало для картинки, виходимо
+            // ГџГЄГ№Г® Г¤Г Г­ГЁГµ Г§Г Г¬Г Г«Г® Г¤Г«Гї ГЄГ Г°ГІГЁГ­ГЄГЁ, ГўГЁГµГ®Г¤ГЁГ¬Г®
             if (data == null || data.Length < 100) return;
 
             try
             {
-                // Створюємо Bitmap у пам'яті
+                // Г‘ГІГўГ®Г°ГѕВєГ¬Г® Bitmap Гі ГЇГ Г¬'ГїГІВі
                 Bitmap bmp = new Bitmap(width, height, PixelFormat.Format24bppRgb);
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, bmp.PixelFormat);
 
-                // Копіюємо дані в текстуру бітмапа
+                // ГЉГ®ГЇВіГѕВєГ¬Г® Г¤Г Г­Ві Гў ГІГҐГЄГ±ГІГіГ°Гі ГЎВіГІГ¬Г ГЇГ 
                 int bytesNeeded = bmpData.Stride * height;
                 int bytesToCopy = Math.Min(bytesNeeded, data.Length);
 
@@ -214,14 +212,14 @@ namespace SecureVideoApp
 
                 bmp.UnlockBits(bmpData);
 
-                // Оновлюємо UI (потокобезпечно)
+                // ГЋГ­Г®ГўГ«ГѕВєГ¬Г® UI (ГЇГ®ГІГ®ГЄГ®ГЎГҐГ§ГЇГҐГ·Г­Г®)
                 if (pbNoise.InvokeRequired)
                 {
                     pbNoise.BeginInvoke(new Action(() =>
                     {
                         var old = pbNoise.Image;
                         pbNoise.Image = bmp;
-                        if (old != null) old.Dispose(); // Чистимо пам'ять
+                        if (old != null) old.Dispose(); // Г—ГЁГ±ГІГЁГ¬Г® ГЇГ Г¬'ГїГІГј
                     }));
                 }
                 else
@@ -233,7 +231,7 @@ namespace SecureVideoApp
             }
             catch (Exception)
             {
-                // Ігноруємо помилки відмальовування (не критично для криптографії)
+                // ВІГЈГ­Г®Г°ГіВєГ¬Г® ГЇГ®Г¬ГЁГ«ГЄГЁ ГўВіГ¤Г¬Г Г«ГјГ®ГўГіГўГ Г­Г­Гї (Г­ГҐ ГЄГ°ГЁГІГЁГ·Г­Г® Г¤Г«Гї ГЄГ°ГЁГЇГІГ®ГЈГ°Г ГґВіВї)
             }
         }
 
@@ -242,13 +240,13 @@ namespace SecureVideoApp
             SetControlsState(false);
             try
             {
-                // Виконуємо важку роботу у фоновому потоці
+            bool isEncFile = selectedFilePath != null && selectedFilePath.EndsWith(".enc", StringComparison.OrdinalIgnoreCase);
                 await Task.Run(action);
             }
             catch (Exception ex)
             {
                 Log($"[CRITICAL ERROR] {ex.Message}");
-                MessageBox.Show(ex.Message, "Помилка криптографії", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "ГЏГ®Г¬ГЁГ«ГЄГ  ГЄГ°ГЁГЇГІГ®ГЈГ°Г ГґВіВї", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -259,11 +257,11 @@ namespace SecureVideoApp
         private void SetControlsState(bool enabled)
         {
             btnSelectFile.Enabled = enabled;
-            // Розумна активація кнопок
+            // ГђГ®Г§ГіГ¬Г­Г  Г ГЄГІГЁГўГ Г¶ВіГї ГЄГ­Г®ГЇГ®ГЄ
             bool isEncFile = selectedFilePath != null && selectedFilePath.EndsWith(".enc");
             btnEncrypt.Enabled = enabled && selectedFilePath != null && !isEncFile;
             btnDecrypt.Enabled = enabled && isEncFile;
-            toolStripStatusLabel1.Text = enabled ? "Готовий" : "Виконується обробка...";
+            toolStripStatusLabel1.Text = enabled ? "ГѓГ®ГІГ®ГўГЁГ©" : "Г‚ГЁГЄГ®Г­ГіВєГІГјГ±Гї Г®ГЎГ°Г®ГЎГЄГ ...";
             Cursor = enabled ? Cursors.Default : Cursors.WaitCursor;
         }
 
@@ -288,11 +286,11 @@ namespace SecureVideoApp
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string infoMessage = "Програма призначена в якості демонстрації прототипу додатку для шифрування медіафайлів (медіапотоків) " +
-                         "методом потокового шифрування (ChaCha20).\n\n" +
-                         "Розроблено в рамках магістерської кваліфікаційної роботи.\n" +
-                         "Розробник: Горохов Іван (КНмаг21), 2025 р.";
-            MessageBox.Show(infoMessage, "Про програму", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            string infoMessage = "ГЏГ°Г®ГЈГ°Г Г¬Г  ГЇГ°ГЁГ§Г­Г Г·ГҐГ­Г  Гў ГїГЄГ®Г±ГІВі Г¤ГҐГ¬Г®Г­Г±ГІГ°Г Г¶ВіВї ГЇГ°Г®ГІГ®ГІГЁГЇГі Г¤Г®Г¤Г ГІГЄГі Г¤Г«Гї ГёГЁГґГ°ГіГўГ Г­Г­Гї Г¬ГҐГ¤ВіГ ГґГ Г©Г«ВіГў (Г¬ГҐГ¤ВіГ ГЇГ®ГІГ®ГЄВіГў) " +
+                         "Г¬ГҐГІГ®Г¤Г®Г¬ ГЇГ®ГІГ®ГЄГ®ГўГ®ГЈГ® ГёГЁГґГ°ГіГўГ Г­Г­Гї (ChaCha20).\n\n" +
+                         "ГђГ®Г§Г°Г®ГЎГ«ГҐГ­Г® Гў Г°Г Г¬ГЄГ Гµ Г¬Г ГЈВіГ±ГІГҐГ°Г±ГјГЄГ®Вї ГЄГўГ Г«ВіГґВіГЄГ Г¶ВіГ©Г­Г®Вї Г°Г®ГЎГ®ГІГЁ.\n" +
+                         "ГђГ®Г§Г°Г®ГЎГ­ГЁГЄ: ГѓГ®Г°Г®ГµГ®Гў ВІГўГ Г­ (ГЉГЌГ¬Г ГЈ21), 2025 Г°.";
+            MessageBox.Show(infoMessage, "ГЏГ°Г® ГЇГ°Г®ГЈГ°Г Г¬Гі", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }
